@@ -16,7 +16,7 @@ server = Flask(__name__)
 
 # Configura o Dash para usar o servidor Flask. 
 # Removendo url_base_pathname para que o Dash rode na raiz, junto com o Flask.
-app = Dash(__name__, server=server)
+app = Dash(__name__, server=server, url_base_pathname="/")
 
 # ==============================
 # 2. CARREGAMENTO E PREPARAÇÃO DOS DADOS
@@ -260,4 +260,4 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
 # ==============================
 
 if __name__ == "__main__":
-    server.run(debug=True)
+    server = app.server
