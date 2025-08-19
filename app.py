@@ -1,35 +1,41 @@
 # app.py
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 import pandas as pd
 import plotly.express as px
 import json
+import os
 
 # ==============================
-# 1. SERVIDOR FLASK
+# 1. SERVIDOR FLASK E DASH
 # ==============================
+
+# Cria o servidor Flask
 server = Flask(__name__)
 
-@server.route('/')
-def index():
-    return render_template('index.html')
+# Configura o Dash para usar o servidor Flask. 
+# Removendo url_base_pathname para que o Dash rode na raiz, junto com o Flask.
+app = Dash(__name__, server=server)
 
 # ==============================
-# 2. DASH
+# 2. CARREGAMENTO E PREPARAÇÃO DOS DADOS
 # ==============================
-app = Dash(__name__, server=server, url_base_pathname='/dashboard/')
+# Usa a variável de ambiente para garantir que os caminhos de arquivos funcionem no Vercel
+# O Vercel coloca os arquivos na raiz do /var/task
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+EVENTOS_PATH = os.path.join(BASE_DIR, "eventos.json")
+LOCAIS_PATH = os.path.join(BASE_DIR, "locais.json")
 
-# ==============================
-# 2.1 CARREGAMENTO E PREPARAÇÃO DOS DADOS
-# ==============================
 try:
-    with open("eventos.json", "r", encoding="utf-8") as f:
+    with open(EVENTOS_PATH, "r", encoding="utf-8") as f:
         eventos = json.load(f)
-    with open("locais.json", "r", encoding="utf-8") as f:
+    with open(LOCAIS_PATH, "r", encoding="utf-8") as f:
         locais = json.load(f)
 except FileNotFoundError as e:
     print(f"Erro: O arquivo {e.filename} não foi encontrado.")
+    # No Vercel, este erro de arquivo pode acontecer se os arquivos não forem incluídos na implantação.
+    # Certifique-se de que os arquivos eventos.json e locais.json estão na raiz do seu repositório.
     raise SystemExit(1)
 
 df_eventos = pd.DataFrame(eventos)
@@ -54,11 +60,6 @@ df["longitude"] = pd.to_numeric(df["longitude"], errors="coerce")
 df = df.dropna(subset=["latitude", "longitude"])
 
 # Datas e ano
-"""
-df['data_criacao'] = pd.to_datetime(df['data_criacao'], errors='coerce')
-df = df.dropna(subset=['data_criacao'])
-df['ano'] = df['data_criacao'].dt.year.astype('Int64')
-"""
 df['data_evento'] = pd.to_datetime(df['data_evento'])
 df['ano'] = df['data_evento'].dt.year.astype('Int64')
 
@@ -76,32 +77,25 @@ anos = sorted([int(a) for a in df['ano'].dropna().unique()])
 
 # ==============================
 # ZONAS (envelopes aproximados + centros)
-# Limite municipal (aprox.): W=-46.84, E=-46.36, N=-23.36, S=-24.00 (DataGeo/IGC)
 # ==============================
 zonas_coordenadas = {
-    # Leste do município (lon >= -46.52), faixa central a norte. Ponto de referência: Brás.
-    'Zona Leste':  {'lat_min': -23.66, 'lat_max': -23.45, 'lon_min': -46.62, 'lon_max': -46.36},
-    # Oeste do município (lon <= -46.67), faixa central
-    'Zona Oeste':  {'lat_min': -23.62, 'lat_max': -23.50, 'lon_min': -46.84, 'lon_max': -46.67},
-    # Norte do Tietê (lat >= ~-23.52)
-    'Zona Norte':  {'lat_min': -23.52, 'lat_max': -23.36, 'lon_min': -46.84, 'lon_max': -46.45},
-    # Sul (inclui extremo sul rural)
-    'Zona Sul':  {'lat_min': -24.00, 'lat_max': -23.62, 'lon_min': -46.84, 'lon_max': -46.50},
-    # Centro histórico/ampliado
+    'Zona Leste':   {'lat_min': -23.66, 'lat_max': -23.45, 'lon_min': -46.62, 'lon_max': -46.36},
+    'Zona Oeste':   {'lat_min': -23.62, 'lat_max': -23.50, 'lon_min': -46.84, 'lon_max': -46.67},
+    'Zona Norte':   {'lat_min': -23.52, 'lat_max': -23.36, 'lon_min': -46.84, 'lon_max': -46.45},
+    'Zona Sul':   {'lat_min': -24.00, 'lat_max': -23.62, 'lon_min': -46.84, 'lon_max': -46.50},
     'Zona Central': {'lat_min': -23.566, 'lat_max': -23.525, 'lon_min': -46.67, 'lon_max': -46.62},
 }
 
 centros_regioes = {
-    'Zona Central': {'lat': -23.5505, 'lon': -46.6333},  # Sé
-    'Zona Norte': {'lat': -23.4950, 'lon': -46.6230},  # Santana/Carandiru
-    'Zona Leste':  {'lat': -23.5600, 'lon': -46.4900},  # Tatuapé/Itaquera (meio termo)
-    'Zona Oeste':{'lat': -23.5700, 'lon': -46.7000}, # Butantã/Vila Sônia
-    'Zona Sul':  {'lat': -23.6800, 'lon': -46.6400},  # Sto Amaro/Brooklin (meio termo)
+    'Zona Central': {'lat': -23.5505, 'lon': -46.6333},
+    'Zona Norte': {'lat': -23.4950, 'lon': -46.6230},
+    'Zona Leste':   {'lat': -23.5600, 'lon': -46.4900},
+    'Zona Oeste': {'lat': -23.5700, 'lon': -46.7000},
+    'Zona Sul':   {'lat': -23.6800, 'lon': -46.6400},
 }
 
 zonas = list(zonas_coordenadas.keys())
 
-# demais filtros
 def limpar_e_obter_unicos(coluna):
     if coluna in df.columns:
         valores = df[coluna].dropna().astype(str).str.strip().unique()
@@ -109,12 +103,12 @@ def limpar_e_obter_unicos(coluna):
     return []
 
 bairros = limpar_e_obter_unicos('bairro')
-# NOVO: obtem a lista de cidades únicas da coluna 'cidade'
 cidades = limpar_e_obter_unicos('cidade')
 
 # ==============================
-# 2.2 LAYOUT DASH
+# 3. LAYOUT DASH
 # ==============================
+
 app.layout = html.Div(
     style={'fontFamily': 'Arial, sans-serif', 'padding': '20px', 'backgroundColor': '#f0f2f5'},
     children=[
@@ -125,13 +119,12 @@ app.layout = html.Div(
             dcc.Dropdown(
                 id='filtro-ano',
                 options=[{'label': str(ano), 'value': ano} for ano in anos],
-                value=None,# sem filtro inicial
+                value=None,
                 clearable=True,
                 placeholder="Todos",
                 style={'width': '150px', 'marginRight': '20px'}
             ),
 
-            # NOVO: Dropdown para o filtro de cidade
             html.Label("Cidade:", style={'marginRight': '5px'}),
             dcc.Dropdown(
                 id='filtro-cidade',
@@ -175,53 +168,45 @@ app.layout = html.Div(
 )
 
 # ==============================
-# 2.3 CALLBACK
+# 4. CALLBACK
 # ==============================
-# Zooms ajustáveis
-ZOOM_PADRAO = 10.5 # zoom quando NÃO há zona selecionada (centro da cidade)
-ZOOM_POR_ZONA = 11 # zoom quando há zona selecionada (ajuste a gosto)
-ZOOM_POR_CIDADE = 12  # NOVO: zoom para quando há cidade selecionada
-ZOOM_POR_BAIRRO = 14 # NOVO: zoom para quando há bairro selecionado
 
-# Centro padrão (igual ao “Centro”, porém com MENOS zoom)
+ZOOM_PADRAO = 10.5
+ZOOM_POR_ZONA = 11
+ZOOM_POR_CIDADE = 12
+ZOOM_POR_BAIRRO = 14
+
 CENTRO_SP = {'lat': centros_regioes['Zona Central']['lat'],
              'lon': centros_regioes['Zona Central']['lon']}
 
 @app.callback(
     Output('mapa-eventos', 'figure'),
     [Input('filtro-ano', 'value'),
-     # NOVO: Adiciona o input do filtro de cidade
      Input('filtro-cidade', 'value'),
      Input('filtro-bairro', 'value'),
      Input('filtro-zona', 'value')]
 )
 def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona_selecionada):
-    # 1) Sempre começa com uma cópia do dataframe completo
     df_filtrado = df.copy()
     center_lat = CENTRO_SP['lat']
     center_lon = CENTRO_SP['lon']
     zoom = ZOOM_PADRAO
     
-    # Aplica os filtros, um por um
     if ano_selecionado:
         df_filtrado = df_filtrado[df_filtrado['ano'] == ano_selecionado]
-    # Lógica de zoom por bairro
+    
     if bairro_selecionado:
         df_filtrado = df_filtrado[df_filtrado['bairro'] == bairro_selecionado]
         if not df_filtrado.empty:
             center_lat = df_filtrado['latitude'].mean()
             center_lon = df_filtrado['longitude'].mean()
             zoom = ZOOM_POR_BAIRRO
-    # Lógica de zoom por cidade
     elif cidade_selecionada:
         df_filtrado = df_filtrado[df_filtrado['cidade'] == cidade_selecionada]
-        
         if not df_filtrado.empty:
             center_lat = df_filtrado['latitude'].mean()
             center_lon = df_filtrado['longitude'].mean()
             zoom = ZOOM_POR_CIDADE
-    
-    # Lógica de zoom para a zona (só é executada se a cidade e o bairro não forem selecionados)
     elif zona_selecionada:
         coords = zonas_coordenadas[zona_selecionada]
         df_filtrado = df_filtrado[
@@ -234,14 +219,11 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
         center_lon = centros_regioes[zona_selecionada]['lon']
         zoom = ZOOM_POR_ZONA
     
-
-    # Agrupa por ponto/local para densidade
     contagem = df_filtrado.groupby(
         ["latitude", "longitude", "nome_local", "endereco_local", "numero"],
         dropna=True
     ).size().reset_index(name="casos")
 
-    # Figura
     if not contagem.empty:
         fig = px.density_mapbox(
             contagem,
@@ -256,7 +238,6 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
             opacity=0.65
         )
     else:
-        # Caso não haja dados, mostra um mapa estático com mensagem
         fig = px.scatter_mapbox(
             lat=[center_lat],
             lon=[center_lon],
@@ -275,7 +256,8 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
     return fig
 
 # ==============================
-# 3. EXECUÇÃO
+# 5. EXECUÇÃO
 # ==============================
+
 if __name__ == "__main__":
     server.run(debug=True)
