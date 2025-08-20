@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - CoSecurity</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- Adicionado para os ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 
-    <!-- A barra de navegação no topo da página -->
     <div class="navbar">
         <div class="navbar-left">
             <button class="menu-button">
@@ -23,7 +21,6 @@
         </div>
     </div>
 
-    <!-- Contêiner principal para o menu lateral e o conteúdo -->
     <div class="content-wrapper">
         <div class="sidebar">
             <div class="logo">
@@ -39,7 +36,6 @@
                 <h1>Dashboard de Ocorrências </h1>
                 <p>Visualize os dados atualizados em tempo real</p>
             </div>
-            <!-- Contêiner para o iframe -->
             <div class="container mt-4">
                 <iframe id="dashboard-iframe" src="/dashboard/"></iframe>
             </div>

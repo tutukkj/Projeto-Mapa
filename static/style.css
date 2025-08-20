@@ -7,7 +7,6 @@
 
 body, html {
     height: 100%;
-    /* Remove o overflow: hidden para permitir a rolagem da página inteira */
     background-color: #f5f6fa;
 }
 
@@ -16,7 +15,6 @@ body {
     flex-direction: column;
 }
 
-/* Nova regra para a barra de navegação */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -51,13 +49,11 @@ body {
     font-size: 24px;
 }
 
-/* Novo contêiner para o layout principal (sidebar + main-content) */
 .content-wrapper {
     display: flex;
     flex-grow: 1;
 }
 
-/* Sidebar */
 .sidebar {
     width: 250px;
     background-color: #002B5B;
@@ -98,13 +94,11 @@ body {
     width: 20px;
 }
 
-/* Main Content: Deixamos ele fluir com o conteúdo */
 .main-content {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     padding: 30px;
-    /* Remove overflow-y para que a rolagem seja na página principal */
 }
 
 .main-content .header {
@@ -126,15 +120,13 @@ body {
     color: #333;
 }
 
-/* O contêiner do iframe agora não tem uma altura fixa */
 .container {
     flex-grow: 1;
 }
 
 #dashboard-iframe {
     width: 100%;
-    /* Removemos a altura fixa para que o script a defina */
-    min-height: 80vh; /* Altura mínima inicial para evitar tela em branco */
+    min-height: 80vh; 
     border: none;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);

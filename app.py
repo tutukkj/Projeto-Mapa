@@ -124,11 +124,9 @@ eventos   = limpar_e_obter_unicos('evento_nome')
 app.layout = html.Div(
     style={'fontFamily': 'Arial, sans-serif', 'padding': '20px', 'backgroundColor': '#f5f6fa'},
     children=[
-        # Painel de filtros agora fixo no topo
-            html.H1("DASHBOARD OCORRÊNCIAS", style={'textAlign': 'center', 'color': '#333', 'paddingBottom': '10px'}),
         html.Div([
+            html.H1("DASHBOARD OCORRÊNCIAS", style={'textAlign': 'center', 'color': '#333', 'paddingBottom': '2px'}),
 
-            # NOVO: Contêiner para os filtros usando um grid responsivo
             html.Div(
                 style={
                     'display': 'grid',
@@ -187,7 +185,6 @@ app.layout = html.Div(
                         ),
                     ], className="filter-group"),
                     
-                    # Novo filtro de hora
                     html.Div([
                         html.Label("Hora:", className="filter-label"),
                         dcc.Dropdown(
@@ -202,7 +199,7 @@ app.layout = html.Div(
 
         ], style={
             'position': 'sticky', 'top': '0', 'zIndex': '100',
-            'padding': '15px', # Reduz o padding para diminuir a altura
+            'padding': '15px', 
             'justifyContent': 'center', 'backgroundColor': '#fff',
             'borderRadius': '12px', 'boxShadow': '0 4px 15px rgba(0,0,0,.1)',
             'marginBottom': '20px'
@@ -210,7 +207,6 @@ app.layout = html.Div(
 
         # Contêiner para os gráficos
         html.Div([
-            # NOVO: Contêiner para o mapa
             html.Div([
                 html.Div(
                     id="evento-frequente",
@@ -251,8 +247,6 @@ CENTRO_SP = {
     'lon': centros_regioes['Zona Central']['lon']
 }
 
-# Callback para o mapa de calor e evento mais frequente
-# NOVO: Adiciona filtro de hora como input
 @app.callback(
     [Output('mapa-eventos', 'figure'),
      Output('evento-frequente', 'children')],
@@ -266,7 +260,6 @@ CENTRO_SP = {
 def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona_selecionada, evento_selecionado, hora_selecionada):
     df_filtrado = df
 
-    # --- Filtros combinados (AND) ---
     if ano_selecionado is not None:
         df_filtrado = df_filtrado[df_filtrado['ano'] == ano_selecionado]
     if cidade_selecionada:
@@ -283,11 +276,9 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
         ]
     if evento_selecionado:
         df_filtrado = df_filtrado[df_filtrado['evento_nome'] == evento_selecionado]
-    # NOVO: Filtra o DataFrame pela hora selecionada
     if hora_selecionada is not None:
         df_filtrado = df_filtrado[df_filtrado['hora'] == hora_selecionada]
 
-    # --- Centro/Zoom por prioridade: bairro > cidade > zona > default ---
     center_lat, center_lon, zoom = CENTRO_SP['lat'], CENTRO_SP['lon'], ZOOM_PADRAO
     if bairro_selecionado and not df_filtrado.empty:
         center_lat = df_filtrado['latitude'].mean()
@@ -302,25 +293,22 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
         center_lon = centros_regioes[zona_selecionada]['lon']
         zoom = ZOOM_POR_ZONA
 
-    # --- Agrupamento para densidade ---
     contagem = df_filtrado.groupby(
         ["latitude", "longitude", "nome_local", "endereco_local", "numero"],
         dropna=True
     ).size().reset_index(name="casos")
 
-    # --- Cartão: evento mais frequente (considerando filtros) ---
     if not df_filtrado.empty:
         vc = df_filtrado['evento_nome'].dropna().value_counts()
         if len(vc) > 0:
             top_evento = vc.index[0]
             top_cont = int(vc.iloc[0])
-            evento_freq_text = f"Evento mais frequente: {top_evento} ({top_cont} ocorrências)"
+            evento_freq_text = f"🔝 Evento mais frequente: {top_evento} ({top_cont} ocorrências)"
         else:
             evento_freq_text = "Sem evento nomeado para os filtros atuais."
     else:
         evento_freq_text = "Nenhum evento encontrado."
 
-    # --- Figura ---
     if not contagem.empty:
         fig = px.density_mapbox(
             contagem,
@@ -351,8 +339,7 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
     return fig, evento_freq_text
 
 
-# Callback para o gráfico de eventos por hora
-# NOTA: Este callback NÃO recebe o filtro de hora como input, conforme solicitado.
+
 @app.callback(
     Output('grafico-hora', 'figure'),
     [Input('filtro-ano', 'value'),
@@ -364,7 +351,6 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
 def atualizar_grafico_hora(ano_selecionado, cidade_selecionada, bairro_selecionado, zona_selecionada, evento_selecionado):
     df_filtrado = df
 
-    # --- Filtros combinados (AND) ---
     if ano_selecionado is not None:
         df_filtrado = df_filtrado[df_filtrado['ano'] == ano_selecionado]
     if cidade_selecionada:
@@ -382,16 +368,15 @@ def atualizar_grafico_hora(ano_selecionado, cidade_selecionada, bairro_seleciona
     if evento_selecionado:
         df_filtrado = df_filtrado[df_filtrado['evento_nome'] == evento_selecionado]
 
-    # Contagem de eventos por hora
     contagem_hora = df_filtrado['hora'].value_counts().sort_index()
 
-    # Criação do gráfico de barras
     fig = px.bar(
         x=contagem_hora.index,
         y=contagem_hora.values,
         labels={'x': 'Hora do Dia', 'y': 'Número de Eventos'},
         title="Distribuição de Eventos por Hora",
-        template="plotly_white"
+        template="plotly_white",
+        text_auto=True 
     )
 
     fig.update_layout(
