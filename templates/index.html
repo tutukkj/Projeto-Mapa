@@ -31,7 +31,7 @@
 </head>
 <body>
 
-    <!-- Nova barra de navegação superior -->
+    <!-- A barra de navegação agora está no topo da página -->
     <div class="navbar">
         <div class="navbar-left">
             <button class="menu-button">
@@ -44,27 +44,30 @@
         </div>
     </div>
 
-    <div class="sidebar">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    <!-- Novo contêiner para o menu lateral e o conteúdo principal -->
+    <div class="content-wrapper">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            </div>
+            <a href="/"> <i class="fas fa-home"></i> Home </a>
+            <a class="active" href="/dashboard"> <i class="fas fa-chart-bar"></i> Dashboard </a>
+            <a href="#"> <i class="fas fa-eye"></i> The Eye </a>
         </div>
-        <a href="/"> <i class="fas fa-home"></i> Home </a>
-        <a class="active" href="/dashboard"> <i class="fas fa-chart-bar"></i> Dashboard </a>
-        <a href="#"> <i class="fas fa-eye"></i> The Eye </a>
+    
+        <div class="main-content">
+            <div class="header">
+                <h1>Dashboard de Ocorrências </h1>
+                <p>Visualize os dados atualizados em tempo real</p>
+            </div>
+            <!-- Contêiner do iframe sem altura fixa -->
+            <div class="container mt-4" style="display:flex; flex-direction:column;">
+                <iframe id="dashboard-iframe" src="/dashboard/"></iframe>
+            </div>
+        </div>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h1>Dashboard de Ocorrências </h1>
-            <p>Visualize os dados atualizados em tempo real</p>
-        </div>
-        <!-- Contêiner do iframe sem altura fixa -->
-        <div class="container mt-4" style="display:flex; flex-direction:column;">
-            <iframe id="dashboard-iframe" src="/dashboard/"></iframe>
-        </div>
-    </div>
-
-    <!-- Script para ajustar a altura do iframe dinamicamente -->
+    <!-- Script para ajustar a altura do iframe dinamicamente com um atraso -->
     <script>
         window.onload = function() {
             const iframe = document.getElementById('dashboard-iframe');
@@ -72,20 +75,23 @@
             // Verifica se o iframe existe na página
             if (iframe) {
                 iframe.onload = function() {
-                    try {
-                        // Acessa o documento interno do iframe
-                        const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    // Adiciona um pequeno atraso para garantir que o conteúdo do Dash foi renderizado
+                    setTimeout(() => {
+                        try {
+                            // Acessa o documento interno do iframe
+                            const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
 
-                        // Pega a altura total do conteúdo do iframe
-                        const scrollHeight = innerDoc.body.scrollHeight;
-                        
-                        // Ajusta a altura do iframe para a altura do conteúdo, mais uma margem de segurança
-                        iframe.style.height = (scrollHeight + 30) + 'px';
-                        console.log("Altura do iframe ajustada para: " + (scrollHeight + 30) + "px");
+                            // Pega a altura total do conteúdo do iframe
+                            const scrollHeight = innerDoc.body.scrollHeight;
+                            
+                            // Ajusta a altura do iframe para a altura do conteúdo, mais uma margem de segurança
+                            iframe.style.height = (scrollHeight + 30) + 'px';
+                            console.log("Altura do iframe ajustada para: " + (scrollHeight + 30) + "px");
 
-                    } catch (e) {
-                        console.error("Não foi possível ajustar a altura do iframe. Verifique a política de mesma origem.", e);
-                    }
+                        } catch (e) {
+                            console.error("Não foi possível ajustar a altura do iframe. Verifique a política de mesma origem.", e);
+                        }
+                    }, 500); // Atraso de 500ms
                 };
             }
         };
