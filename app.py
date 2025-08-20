@@ -34,8 +34,6 @@ except FileNotFoundError as e:
 df_eventos = pd.DataFrame(eventos)
 df_locais = pd.DataFrame(locais)
 
-# Usando 'left join' para manter todos os eventos do df_eventos
-# e 'left_on'/'right_on' para mapear 'local_id' para 'id'.
 df = pd.merge(
     df_eventos, df_locais,
     how="left",
@@ -61,14 +59,11 @@ df = df.dropna(subset=['data_evento'])
 df['ano'] = df['data_evento'].dt.year.astype('Int64')
 df['hora'] = df['data_evento'].dt.hour
 
-# ===== Normalizações importantes =====
-# Usar dtype "string" do pandas para preservar NA (evita "Nan" string)
 for col in ['bairro', 'cidade', 'evento_nome']:
     if col in df.columns:
         df[col] = df[col].astype('string')
         df[col] = df[col].str.strip()
         df[col] = df[col].replace({'': pd.NA})
-        # padronização de capitalização (ignora NA)
         df[col] = df[col].str.title()
 
 # Escala de cores
@@ -83,11 +78,10 @@ escala_personalizada = [
 
 anos = sorted([int(a) for a in df['ano'].dropna().unique()])
 
-# Novo: Gera lista de horas para o filtro
 horas = list(range(24))
 
 # ==============================
-# ZONAS (envelopes aproximados + centros)
+# ZONAS 
 # ==============================
 zonas_coordenadas = {
     'Zona Leste':   {'lat_min': -23.66, 'lat_max': -23.45, 'lon_min': -46.62, 'lon_max': -46.36},
@@ -108,9 +102,7 @@ zonas = list(zonas_coordenadas.keys())
 
 def limpar_e_obter_unicos(coluna):
     if coluna in df.columns:
-        # trabalha em cima do dtype string com NA preservado
         valores = df[coluna].dropna().unique().tolist()
-        # ordena ignorando acentos/maiúsculas de forma simples
         return sorted(valores)
     return []
 
@@ -303,7 +295,7 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
         if len(vc) > 0:
             top_evento = vc.index[0]
             top_cont = int(vc.iloc[0])
-            evento_freq_text = f"🔝 Evento mais frequente: {top_evento} ({top_cont} ocorrências)"
+            evento_freq_text = f"Evento mais frequente: {top_evento} ({top_cont} ocorrências)"
         else:
             evento_freq_text = "Sem evento nomeado para os filtros atuais."
     else:
