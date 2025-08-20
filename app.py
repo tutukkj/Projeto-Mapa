@@ -126,7 +126,7 @@ app.layout = html.Div(
     children=[
         # Painel de filtros agora fixo no topo
         html.Div([
-            html.H1("DASHBOARD Ocorrências", style={'textAlign': 'center', 'color': '#333', 'paddingBottom': '10px'}),
+            #html.H1("DASHBOARD Ocorrências", style={'textAlign': 'center', 'color': '#333', 'paddingBottom': '10px'}),
 
             # NOVO: Contêiner para os filtros usando um grid responsivo
             html.Div(
