@@ -7,6 +7,27 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- Adicionado para os ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* CSS para a página principal */
+        body {
+            /* Permite que o corpo da página cresça com o conteúdo */
+            display: block;
+        }
+
+        /* Remove a altura fixa do contêiner para que ele possa se expandir */
+        .container {
+            height: auto !important;
+        }
+
+        /* Ajustes para o iframe */
+        #dashboard-iframe {
+            display: block;
+            width: 100%;
+            border: none;
+            /* Altura inicial mínima, será ajustada via JavaScript */
+            min-height: 80vh; 
+        }
+    </style>
 </head>
 <body>
 
@@ -37,11 +58,37 @@
             <h1>Dashboard de Ocorrências </h1>
             <p>Visualize os dados atualizados em tempo real</p>
         </div>
-        <!-- Aumentando a altura do contêiner do iframe para acomodar os gráficos maiores -->
-        <div class="container mt-4" style="display:flex; flex-direction:column; height:130vh;">
-            <iframe src="/dashboard/" style="flex:1; width:100%; border:none;"></iframe>
+        <!-- Contêiner do iframe sem altura fixa -->
+        <div class="container mt-4" style="display:flex; flex-direction:column;">
+            <iframe id="dashboard-iframe" src="/dashboard/"></iframe>
         </div>
     </div>
 
+    <!-- Script para ajustar a altura do iframe dinamicamente -->
+    <script>
+        window.onload = function() {
+            const iframe = document.getElementById('dashboard-iframe');
+            
+            // Verifica se o iframe existe na página
+            if (iframe) {
+                iframe.onload = function() {
+                    try {
+                        // Acessa o documento interno do iframe
+                        const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+                        // Pega a altura total do conteúdo do iframe
+                        const scrollHeight = innerDoc.body.scrollHeight;
+                        
+                        // Ajusta a altura do iframe para a altura do conteúdo, mais uma margem de segurança
+                        iframe.style.height = (scrollHeight + 30) + 'px';
+                        console.log("Altura do iframe ajustada para: " + (scrollHeight + 30) + "px");
+
+                    } catch (e) {
+                        console.error("Não foi possível ajustar a altura do iframe. Verifique a política de mesma origem.", e);
+                    }
+                };
+            }
+        };
+    </script>
 </body>
 </html>
