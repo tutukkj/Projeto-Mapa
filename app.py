@@ -314,7 +314,7 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
         if len(vc) > 0:
             top_evento = vc.index[0]
             top_cont = int(vc.iloc[0])
-            evento_freq_text = f"🔝 Evento mais frequente: {top_evento} ({top_cont} ocorrências)"
+            evento_freq_text = f"Evento mais frequente: {top_evento} ({top_cont} ocorrências)"
         else:
             evento_freq_text = "Sem evento nomeado para os filtros atuais."
     else:

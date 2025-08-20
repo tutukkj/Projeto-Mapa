@@ -7,31 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- Adicionado para os ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        /* CSS para a página principal */
-        body {
-            /* Permite que o corpo da página cresça com o conteúdo */
-            display: block;
-        }
-
-        /* Remove a altura fixa do contêiner para que ele possa se expandir */
-        .container {
-            height: auto !important;
-        }
-
-        /* Ajustes para o iframe */
-        #dashboard-iframe {
-            display: block;
-            width: 100%;
-            border: none;
-            /* Altura inicial mínima, será ajustada via JavaScript */
-            min-height: 80vh; 
-        }
-    </style>
 </head>
 <body>
 
-    <!-- A barra de navegação agora está no topo da página -->
+    <!-- A barra de navegação no topo da página -->
     <div class="navbar">
         <div class="navbar-left">
             <button class="menu-button">
@@ -44,7 +23,7 @@
         </div>
     </div>
 
-    <!-- Novo contêiner para o menu lateral e o conteúdo principal -->
+    <!-- Contêiner principal para o menu lateral e o conteúdo -->
     <div class="content-wrapper">
         <div class="sidebar">
             <div class="logo">
@@ -60,38 +39,43 @@
                 <h1>Dashboard de Ocorrências </h1>
                 <p>Visualize os dados atualizados em tempo real</p>
             </div>
-            <!-- Contêiner do iframe sem altura fixa -->
-            <div class="container mt-4" style="display:flex; flex-direction:column;">
+            <!-- Contêiner para o iframe -->
+            <div class="container mt-4">
                 <iframe id="dashboard-iframe" src="/dashboard/"></iframe>
             </div>
         </div>
     </div>
 
-    <!-- Script para ajustar a altura do iframe dinamicamente com um atraso -->
+    <!-- Script para ajustar a altura do iframe dinamicamente -->
     <script>
         window.onload = function() {
             const iframe = document.getElementById('dashboard-iframe');
             
-            // Verifica se o iframe existe na página
             if (iframe) {
                 iframe.onload = function() {
-                    // Adiciona um pequeno atraso para garantir que o conteúdo do Dash foi renderizado
-                    setTimeout(() => {
-                        try {
-                            // Acessa o documento interno do iframe
-                            const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    try {
+                        const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
 
-                            // Pega a altura total do conteúdo do iframe
+                        // Função para ajustar a altura do iframe
+                        const adjustIframeHeight = () => {
+                            // Calcula a altura real do conteúdo
                             const scrollHeight = innerDoc.body.scrollHeight;
-                            
-                            // Ajusta a altura do iframe para a altura do conteúdo, mais uma margem de segurança
-                            iframe.style.height = (scrollHeight + 30) + 'px';
+                            iframe.style.height = (scrollHeight + 30) + 'px'; // Adiciona uma pequena margem
                             console.log("Altura do iframe ajustada para: " + (scrollHeight + 30) + "px");
+                        };
 
-                        } catch (e) {
-                            console.error("Não foi possível ajustar a altura do iframe. Verifique a política de mesma origem.", e);
-                        }
-                    }, 500); // Atraso de 500ms
+                        // Cria um observador para detectar mudanças no DOM do iframe
+                        const observer = new MutationObserver(adjustIframeHeight);
+                        
+                        // Observa mudanças no corpo do documento do iframe (criação de nós, etc)
+                        observer.observe(innerDoc.body, { childList: true, subtree: true, attributes: true });
+
+                        // Chama o ajuste de altura inicial
+                        adjustIframeHeight();
+
+                    } catch (e) {
+                        console.error("Não foi possível ajustar a altura do iframe. Verifique a política de mesma origem.", e);
+                    }
                 };
             }
         };

@@ -5,16 +5,62 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
+body, html {
+    height: 100%;
+    /* Remove o overflow: hidden para permitir a rolagem da página inteira */
+    background-color: #f5f6fa;
+}
+
 body {
     display: flex;
-    height: 100vh;
-    background-color: #f5f6fa;
+    flex-direction: column;
+}
+
+/* Nova regra para a barra de navegação */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #002B5B;
+    color: white;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    min-height: 60px;
+}
+
+.navbar-left .menu-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-name {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.user-icon {
+    font-size: 24px;
+}
+
+/* Novo contêiner para o layout principal (sidebar + main-content) */
+.content-wrapper {
+    display: flex;
+    flex-grow: 1;
 }
 
 /* Sidebar */
 .sidebar {
     width: 250px;
-    background-color: #003366;
+    background-color: #002B5B;
     color: white;
     display: flex;
     flex-direction: column;
@@ -52,10 +98,13 @@ body {
     width: 20px;
 }
 
-/* Main Content */
+/* Main Content: Deixamos ele fluir com o conteúdo */
 .main-content {
-    flex: 1;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
     padding: 30px;
+    /* Remove overflow-y para que a rolagem seja na página principal */
 }
 
 .main-content .header {
@@ -65,6 +114,7 @@ body {
     margin-bottom: 30px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     text-align: center;
+    flex-shrink: 0;
 }
 
 .main-content .header h1 {
@@ -72,77 +122,20 @@ body {
     margin-bottom: 10px;
 }
 
-.main-content .cards {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.main-content .card {
-    background-color: white;
-    flex: 1;
-    min-width: 250px;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.main-content .card img {
-    width: 100px;
-    margin-bottom: 10px;
-}
-
-.main-content .card h3 {
-    color: #007bff;
-    font-size: 24px;
-    margin-bottom: 5px;
-}
-
-.main-content .card p {
+.main-content .header p {
     color: #333;
 }
-.iframe-container {
+
+/* O contêiner do iframe agora não tem uma altura fixa */
+.container {
+    flex-grow: 1;
+}
+
+#dashboard-iframe {
     width: 100%;
-    height: 80vh;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.iframe-container iframe {
-    width: 100%;
-    height: 100%;
-}
-
-.container .js-plotly-plot {
-    width: 100% !important;
-}
-
-.container iframe {
-    width: 100% !important;
-    height: 100% !important;
-}
-
-#dash-container iframe {
-    width: 100%;
-    height: calc(100vh - 100px); /* subtraia o header ou margens */
+    /* Removemos a altura fixa para que o script a defina */
+    min-height: 80vh; /* Altura mínima inicial para evitar tela em branco */
     border: none;
-}
-
-.sidebar {
-    width: 250px;              /* largura do menu lateral */
-    background-color: #002B5B; /* azul da sua navbar */
-    height: 100vh;             /* ocupa 100% da altura da tela */
-    position: fixed;           /* fixa na lateral */
-    top: 0;
-    left: 0;
-    padding-top: 20px;
-    display: flex;
-    flex-direction: column;
-}
-
-.main-content {
-    margin-left: 250px; /* mesmo valor da largura da sidebar */
-    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
