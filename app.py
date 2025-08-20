@@ -123,78 +123,89 @@ eventos  = limpar_e_obter_unicos('evento_nome')
 # 2.2 LAYOUT DASH
 # ==============================
 app.layout = html.Div(
-    style={'fontFamily': 'Arial, sans-serif', 'padding': '20px', 'backgroundColor': '#f0f2f5'},
+    style={'fontFamily': 'Arial, sans-serif', 'padding': '20px', 'backgroundColor': '#f5f6fa'},
     children=[
         # Painel de filtros agora fixo no topo
         html.Div([
-            # Adiciona o título do dashboard aqui
             html.H1("DASHBOARD Ocorrências", style={'textAlign': 'center', 'color': '#333', 'paddingBottom': '20px'}),
 
-            html.Div([
-                html.Label("Ano:", className="filter-label"),
-                dcc.Dropdown(
-                    id='filtro-ano',
-                    options=[{'label': str(ano), 'value': ano} for ano in anos],
-                    value=None, clearable=True, placeholder="Todos",
-                    style={'width': '200px', 'zIndex': 101}
-                ),
-            ], className="filter-group"),
+            # NOVO: Contêiner flexível para os filtros
+            html.Div(
+                style={
+                    'display': 'flex',
+                    'flexWrap': 'wrap', # Permite que os itens quebrem para a próxima linha
+                    'gap': '20px',      # Reduz o espaçamento em telas pequenas
+                    'justifyContent': 'flex-start'
+                },
+                children=[
+                    html.Div([
+                        html.Label("Ano:", className="filter-label"),
+                        dcc.Dropdown(
+                            id='filtro-ano',
+                            options=[{'label': str(ano), 'value': ano} for ano in anos],
+                            value=None, clearable=True, placeholder="Todos",
+                            # Removido o width fixo de 200px
+                            style={'zIndex': 101, 'width': '100%'}
+                        ),
+                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}), # Cresce e tem uma largura mínima
 
-            html.Div([
-                html.Label("Cidade:", className="filter-label"),
-                dcc.Dropdown(
-                    id='filtro-cidade',
-                    options=[{'label': c, 'value': c} for c in cidades],
-                    value=None, clearable=True, placeholder="Todas",
-                    style={'width': '200px', 'zIndex': 101}
-                ),
-            ], className="filter-group"),
+                    html.Div([
+                        html.Label("Cidade:", className="filter-label"),
+                        dcc.Dropdown(
+                            id='filtro-cidade',
+                            options=[{'label': c, 'value': c} for c in cidades],
+                            value=None, clearable=True, placeholder="Todas",
+                            style={'zIndex': 101, 'width': '100%'}
+                        ),
+                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
 
-            html.Div([
-                html.Label("Bairro:", className="filter-label"),
-                dcc.Dropdown(
-                    id='filtro-bairro',
-                    options=[{'label': b, 'value': b} for b in bairros],
-                    value=None, clearable=True, placeholder="Todos",
-                    style={'width': '200px', 'zIndex': 101}
-                ),
-            ], className="filter-group"),
+                    html.Div([
+                        html.Label("Bairro:", className="filter-label"),
+                        dcc.Dropdown(
+                            id='filtro-bairro',
+                            options=[{'label': b, 'value': b} for b in bairros],
+                            value=None, clearable=True, placeholder="Todos",
+                            style={'zIndex': 101, 'width': '100%'}
+                        ),
+                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
 
-            html.Div([
-                html.Label("Zona:", className="filter-label"),
-                dcc.Dropdown(
-                    id='filtro-zona',
-                    options=[{'label': z, 'value': z} for z in zonas],
-                    value=None, clearable=True, placeholder="Todas",
-                    style={'width': '200px', 'zIndex': 101}
-                ),
-            ], className="filter-group"),
+                    html.Div([
+                        html.Label("Zona:", className="filter-label"),
+                        dcc.Dropdown(
+                            id='filtro-zona',
+                            options=[{'label': z, 'value': z} for z in zonas],
+                            value=None, clearable=True, placeholder="Todas",
+                            style={'zIndex': 101, 'width': '100%'}
+                        ),
+                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
 
-            html.Div([
-                html.Label("Evento:", className="filter-label"),
-                dcc.Dropdown(
-                    id='filtro-evento',
-                    options=[{'label': e, 'value': e} for e in eventos],
-                    value=None, clearable=True, placeholder="Todos",
-                    style={'width': '200px', 'zIndex': 101}
-                ),
-            ], className="filter-group"),
-            
-            # Novo filtro de hora
-            html.Div([
-                html.Label("Hora:", className="filter-label"),
-                dcc.Dropdown(
-                    id='filtro-hora',
-                    options=[{'label': f'{h:02d}:00', 'value': h} for h in horas],
-                    value=None, clearable=True, placeholder="Todas",
-                    style={'width': '200px', 'zIndex': 101}
-                ),
-            ], className="filter-group"),
+                    html.Div([
+                        html.Label("Evento:", className="filter-label"),
+                        dcc.Dropdown(
+                            id='filtro-evento',
+                            options=[{'label': e, 'value': e} for e in eventos],
+                            value=None, clearable=True, placeholder="Todos",
+                            style={'zIndex': 101, 'width': '100%'}
+                        ),
+                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
+                    
+                    # Novo filtro de hora
+                    html.Div([
+                        html.Label("Hora:", className="filter-label"),
+                        dcc.Dropdown(
+                            id='filtro-hora',
+                            options=[{'label': f'{h:02d}:00', 'value': h} for h in horas],
+                            value=None, clearable=True, placeholder="Todas",
+                            style={'zIndex': 101, 'width': '100%'}
+                        ),
+                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
+                ]
+            ),
 
         ], style={
             'position': 'sticky', 'top': '0', 'zIndex': '100',
-            'display': 'flex', 'flexWrap': 'nowrap', 'gap': '40px', 'padding': '40px',
-            'justifyContent': 'flex-start', 'backgroundColor': '#fff',
+            'padding': '40px',
+            'justifyContent': 'center', 'backgroundColor': '#fff',
             'borderRadius': '12px', 'boxShadow': '0 4px 15px rgba(0,0,0,.1)',
             'marginBottom': '20px'
         }),
