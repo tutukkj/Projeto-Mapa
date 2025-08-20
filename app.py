@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
@@ -91,19 +90,19 @@ horas = list(range(24))
 # ZONAS (envelopes aproximados + centros)
 # ==============================
 zonas_coordenadas = {
-    'Zona Leste':  {'lat_min': -23.66, 'lat_max': -23.45, 'lon_min': -46.62, 'lon_max': -46.36},
-    'Zona Oeste':  {'lat_min': -23.62, 'lat_max': -23.50, 'lon_min': -46.84, 'lon_max': -46.67},
-    'Zona Norte':  {'lat_min': -23.52, 'lat_max': -23.36, 'lon_min': -46.84, 'lon_max': -46.45},
-    'Zona Sul':    {'lat_min': -24.00, 'lat_max': -23.62, 'lon_min': -46.84, 'lon_max': -46.50},
+    'Zona Leste':   {'lat_min': -23.66, 'lat_max': -23.45, 'lon_min': -46.62, 'lon_max': -46.36},
+    'Zona Oeste':   {'lat_min': -23.62, 'lat_max': -23.50, 'lon_min': -46.84, 'lon_max': -46.67},
+    'Zona Norte':   {'lat_min': -23.52, 'lat_max': -23.36, 'lon_min': -46.84, 'lon_max': -46.45},
+    'Zona Sul':     {'lat_min': -24.00, 'lat_max': -23.62, 'lon_min': -46.84, 'lon_max': -46.50},
     'Zona Central':{'lat_min': -23.566, 'lat_max': -23.525,'lon_min': -46.67, 'lon_max': -46.62},
 }
 
 centros_regioes = {
     'Zona Central': {'lat': -23.5505, 'lon': -46.6333},
-    'Zona Norte':   {'lat': -23.4950, 'lon': -46.6230},
-    'Zona Leste':   {'lat': -23.5600, 'lon': -46.4900},
-    'Zona Oeste':   {'lat': -23.5700, 'lon': -46.7000},
-    'Zona Sul':     {'lat': -23.6800, 'lon': -46.6400},
+    'Zona Norte':    {'lat': -23.4950, 'lon': -46.6230},
+    'Zona Leste':    {'lat': -23.5600, 'lon': -46.4900},
+    'Zona Oeste':    {'lat': -23.5700, 'lon': -46.7000},
+    'Zona Sul':      {'lat': -23.6800, 'lon': -46.6400},
 }
 zonas = list(zonas_coordenadas.keys())
 
@@ -115,9 +114,9 @@ def limpar_e_obter_unicos(coluna):
         return sorted(valores)
     return []
 
-bairros  = limpar_e_obter_unicos('bairro')
-cidades  = limpar_e_obter_unicos('cidade')
-eventos  = limpar_e_obter_unicos('evento_nome')
+bairros   = limpar_e_obter_unicos('bairro')
+cidades   = limpar_e_obter_unicos('cidade')
+eventos   = limpar_e_obter_unicos('evento_nome')
 
 # ==============================
 # 2.2 LAYOUT DASH
@@ -127,15 +126,15 @@ app.layout = html.Div(
     children=[
         # Painel de filtros agora fixo no topo
         html.Div([
-            html.H1("DASHBOARD Ocorrências", style={'textAlign': 'center', 'color': '#333', 'paddingBottom': '20px'}),
+            html.H1("DASHBOARD Ocorrências", style={'textAlign': 'center', 'color': '#333', 'paddingBottom': '10px'}),
 
-            # NOVO: Contêiner flexível para os filtros
+            # NOVO: Contêiner para os filtros usando um grid responsivo
             html.Div(
                 style={
-                    'display': 'flex',
-                    'flexWrap': 'wrap', # Permite que os itens quebrem para a próxima linha
-                    'gap': '20px',      # Reduz o espaçamento em telas pequenas
-                    'justifyContent': 'flex-start'
+                    'display': 'grid',
+                    'grid-template-columns': 'repeat(auto-fit, minmax(150px, 1fr))', # Ajuste o minmax para controlar a largura mínima
+                    'gap': '10px',
+                    'justify-content': 'center',
                 },
                 children=[
                     html.Div([
@@ -144,10 +143,9 @@ app.layout = html.Div(
                             id='filtro-ano',
                             options=[{'label': str(ano), 'value': ano} for ano in anos],
                             value=None, clearable=True, placeholder="Todos",
-                            # Removido o width fixo de 200px
                             style={'zIndex': 101, 'width': '100%'}
                         ),
-                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}), # Cresce e tem uma largura mínima
+                    ], className="filter-group"),
 
                     html.Div([
                         html.Label("Cidade:", className="filter-label"),
@@ -157,7 +155,7 @@ app.layout = html.Div(
                             value=None, clearable=True, placeholder="Todas",
                             style={'zIndex': 101, 'width': '100%'}
                         ),
-                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
+                    ], className="filter-group"),
 
                     html.Div([
                         html.Label("Bairro:", className="filter-label"),
@@ -167,7 +165,7 @@ app.layout = html.Div(
                             value=None, clearable=True, placeholder="Todos",
                             style={'zIndex': 101, 'width': '100%'}
                         ),
-                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
+                    ], className="filter-group"),
 
                     html.Div([
                         html.Label("Zona:", className="filter-label"),
@@ -177,7 +175,7 @@ app.layout = html.Div(
                             value=None, clearable=True, placeholder="Todas",
                             style={'zIndex': 101, 'width': '100%'}
                         ),
-                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
+                    ], className="filter-group"),
 
                     html.Div([
                         html.Label("Evento:", className="filter-label"),
@@ -187,7 +185,7 @@ app.layout = html.Div(
                             value=None, clearable=True, placeholder="Todos",
                             style={'zIndex': 101, 'width': '100%'}
                         ),
-                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
+                    ], className="filter-group"),
                     
                     # Novo filtro de hora
                     html.Div([
@@ -198,13 +196,13 @@ app.layout = html.Div(
                             value=None, clearable=True, placeholder="Todas",
                             style={'zIndex': 101, 'width': '100%'}
                         ),
-                    ], className="filter-group", style={'flex-grow': '1', 'min-width': '180px'}),
+                    ], className="filter-group"),
                 ]
             ),
 
         ], style={
             'position': 'sticky', 'top': '0', 'zIndex': '100',
-            'padding': '40px',
+            'padding': '15px', # Reduz o padding para diminuir a altura
             'justifyContent': 'center', 'backgroundColor': '#fff',
             'borderRadius': '12px', 'boxShadow': '0 4px 15px rgba(0,0,0,.1)',
             'marginBottom': '20px'

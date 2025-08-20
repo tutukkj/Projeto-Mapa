@@ -5,8 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - CoSecurity</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Adicionado para os ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
+
+    <!-- Nova barra de navegação superior -->
+    <div class="navbar">
+        <div class="navbar-left">
+            <button class="menu-button">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div class="navbar-right">
+            <span class="user-name">Arthur Nunes</span>
+            <i class="fas fa-user-circle user-icon"></i>
+        </div>
+    </div>
 
     <div class="sidebar">
         <div class="logo">
@@ -22,12 +37,9 @@
             <h1>Dashboard de Movimentação</h1>
             <p>Visualize os dados atualizados em tempo real</p>
         </div>
-
-<div class="container mt-4" style="display:flex; flex-direction:column; height:80vh;">
-    <iframe src="/dashboard/" style="flex:1; width:100%; border:none;"></iframe>
-</div>
-
-
+        <div class="container mt-4" style="display:flex; flex-direction:column; height:80vh;">
+            <iframe src="/dashboard/" style="flex:1; width:100%; border:none;"></iframe>
+        </div>
     </div>
 
 </body>
