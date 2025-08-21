@@ -84,10 +84,10 @@ horas = list(range(24))
 # ZONAS 
 # ==============================
 zonas_coordenadas = {
-    'Zona Leste':   {'lat_min': -23.66, 'lat_max': -23.45, 'lon_min': -46.62, 'lon_max': -46.36},
-    'Zona Oeste':   {'lat_min': -23.62, 'lat_max': -23.50, 'lon_min': -46.84, 'lon_max': -46.67},
-    'Zona Norte':   {'lat_min': -23.52, 'lat_max': -23.36, 'lon_min': -46.84, 'lon_max': -46.45},
-    'Zona Sul':     {'lat_min': -24.00, 'lat_max': -23.62, 'lon_min': -46.84, 'lon_max': -46.50},
+    'Zona Leste':    {'lat_min': -23.66, 'lat_max': -23.45, 'lon_min': -46.62, 'lon_max': -46.36},
+    'Zona Oeste':    {'lat_min': -23.62, 'lat_max': -23.50, 'lon_min': -46.84, 'lon_max': -46.67},
+    'Zona Norte':    {'lat_min': -23.52, 'lat_max': -23.36, 'lon_min': -46.84, 'lon_max': -46.45},
+    'Zona Sul':      {'lat_min': -24.00, 'lat_max': -23.62, 'lon_min': -46.84, 'lon_max': -46.50},
     'Zona Central':{'lat_min': -23.566, 'lat_max': -23.525,'lon_min': -46.67, 'lon_max': -46.62},
 }
 
@@ -117,15 +117,19 @@ app.layout = html.Div(
     style={'fontFamily': 'Arial, sans-serif', 'padding': '20px', 'backgroundColor': '#f5f6fa'},
     children=[
         html.Div([
-            html.H1("DASHBOARD OCORRÊNCIAS", style={'textAlign': 'center', 'color': '#333', 'paddingBottom': '2px'}),
-
+            # Barra de Filtros
             html.Div(
-                style={
-                    'display': 'grid',
-                    'grid-template-columns': 'repeat(auto-fit, minmax(150px, 1fr))', # Ajuste o minmax para controlar a largura mínima
-                    'gap': '10px',
-                    'justify-content': 'center',
-                },
+                    style={
+                        'display': 'flex',
+                        'flex-wrap': 'wrap',
+                        'gap': '5px',
+                        'justify-content': 'center',
+                        'padding': '5px 0',
+                        'maxWidth': '1200px',   # largura máxima
+                        'maxHeight': '100px',   # altura máxima da barra
+                        'overflowY': 'auto',    # adiciona scroll vertical se passar do limite
+                        'margin': '0 auto'
+                    },
                 children=[
                     html.Div([
                         html.Label("Ano:", className="filter-label"),
@@ -133,9 +137,9 @@ app.layout = html.Div(
                             id='filtro-ano',
                             options=[{'label': str(ano), 'value': ano} for ano in anos],
                             value=None, clearable=True, placeholder="Todos",
-                            style={'zIndex': 101, 'width': '100%'}
+                            style={'zIndex': 101, 'minWidth': '120px'} # Define largura mínima para o dropdown
                         ),
-                    ], className="filter-group"),
+                    ], className="filter-group", style={'flex': '1 1 auto', 'minWidth': '120px'}),
 
                     html.Div([
                         html.Label("Cidade:", className="filter-label"),
@@ -143,9 +147,9 @@ app.layout = html.Div(
                             id='filtro-cidade',
                             options=[{'label': c, 'value': c} for c in cidades],
                             value=None, clearable=True, placeholder="Todas",
-                            style={'zIndex': 101, 'width': '100%'}
+                            style={'zIndex': 101, 'minWidth': '120px'}
                         ),
-                    ], className="filter-group"),
+                    ], className="filter-group", style={'flex': '1 1 auto', 'minWidth': '120px'}),
 
                     html.Div([
                         html.Label("Bairro:", className="filter-label"),
@@ -153,9 +157,9 @@ app.layout = html.Div(
                             id='filtro-bairro',
                             options=[{'label': b, 'value': b} for b in bairros],
                             value=None, clearable=True, placeholder="Todos",
-                            style={'zIndex': 101, 'width': '100%'}
+                            style={'zIndex': 101, 'minWidth': '120px'}
                         ),
-                    ], className="filter-group"),
+                    ], className="filter-group", style={'flex': '1 1 auto', 'minWidth': '120px'}),
 
                     html.Div([
                         html.Label("Zona:", className="filter-label"),
@@ -163,9 +167,9 @@ app.layout = html.Div(
                             id='filtro-zona',
                             options=[{'label': z, 'value': z} for z in zonas],
                             value=None, clearable=True, placeholder="Todas",
-                            style={'zIndex': 101, 'width': '100%'}
+                            style={'zIndex': 101, 'minWidth': '120px'}
                         ),
-                    ], className="filter-group"),
+                    ], className="filter-group", style={'flex': '1 1 auto', 'minWidth': '120px'}),
 
                     html.Div([
                         html.Label("Evento:", className="filter-label"),
@@ -173,9 +177,9 @@ app.layout = html.Div(
                             id='filtro-evento',
                             options=[{'label': e, 'value': e} for e in eventos],
                             value=None, clearable=True, placeholder="Todos",
-                            style={'zIndex': 101, 'width': '100%'}
+                            style={'zIndex': 101, 'minWidth': '120px'}
                         ),
-                    ], className="filter-group"),
+                    ], className="filter-group", style={'flex': '1 1 auto', 'minWidth': '120px'}),
                     
                     html.Div([
                         html.Label("Hora:", className="filter-label"),
@@ -183,9 +187,9 @@ app.layout = html.Div(
                             id='filtro-hora',
                             options=[{'label': f'{h:02d}:00', 'value': h} for h in horas],
                             value=None, clearable=True, placeholder="Todas",
-                            style={'zIndex': 101, 'width': '100%'}
+                            style={'zIndex': 101, 'minWidth': '120px'}
                         ),
-                    ], className="filter-group"),
+                    ], className="filter-group", style={'flex': '1 1 auto', 'minWidth': '120px'}),
                 ]
             ),
 
@@ -329,7 +333,6 @@ def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona
 
     fig.update_layout(margin={"r":0, "t":0, "l":0, "b":0})
     return fig, evento_freq_text
-
 
 
 @app.callback(
