@@ -23,7 +23,7 @@ app = Dash(__name__, server=server, url_base_pathname='/dashboard/')
 # 2.1 CARREGAMENTO E PREPARAÇÃO DOS DADOS
 # ==============================
 try:
-    with open("eventos.json", "r", encoding="utf-8") as f:
+    with open("eventos_estruturados.json", "r", encoding="utf-8") as f:
         eventos = json.load(f)
     with open("locais.json", "r", encoding="utf-8") as f:
         locais = json.load(f)
