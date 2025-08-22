@@ -131,7 +131,7 @@ app.layout = html.Div(
                         id='filtro-ano',
                         options=[{'label': str(ano), 'value': ano} for ano in anos],
                         value=None, clearable=True, placeholder="Todos",
-                        style={'zIndex': 101, 'minWidth': '120px'}
+                        style={'zIndex': 101, 'minWidth': '10%'}
                     ),
                 ], className="filter-group", style={'flex': '1 1 auto', 'minWidth': '120px'}),
                 
