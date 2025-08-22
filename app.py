@@ -116,13 +116,18 @@ eventos   = limpar_e_obter_unicos('evento_nome')
 app.layout = html.Div(
     style={'fontFamily': 'Arial, sans-serif', 'padding': '20px', 'backgroundColor': '#f5f6fa'},
     children=[
+        # Contêiner para os filtros, agora com estilo de barra
         html.Div(
             style={
-                'position': 'sticky', 'top': '0', 'zIndex': '100',
+                'display': 'flex',
+                'flex-wrap': 'wrap',
+                'gap': '5px',
+                'justify-content': 'center',
                 'padding': '15px', 
-                'justifyContent': 'center', 'backgroundColor': '#fff',
-                'borderRadius': '12px', 'boxShadow': '0 4px 15px rgba(0,0,0,.1)',
-                'marginBottom': '20px'
+                'backgroundColor': '#fff',
+                'borderRadius': '12px',
+                'boxShadow': '0 4px 15px rgba(0,0,0,.1)',
+                'marginBottom': '20px',
             },
             children=[
                 html.Div([
@@ -131,7 +136,7 @@ app.layout = html.Div(
                         id='filtro-ano',
                         options=[{'label': str(ano), 'value': ano} for ano in anos],
                         value=None, clearable=True, placeholder="Todos",
-                        style={'zIndex': 101, 'minWidth': '10%'}
+                        style={'zIndex': 101, 'minWidth': '120px'}
                     ),
                 ], className="filter-group", style={'flex': '1 1 auto', 'minWidth': '120px'}),
                 
@@ -237,7 +242,7 @@ CENTRO_SP = {
      Input('filtro-bairro', 'value'),
      Input('filtro-zona', 'value'),
      Input('filtro-evento', 'value'),
-     Input('filtro-hora', 'value')] # Novo input
+     Input('filtro-hora', 'value')]
 )
 def atualizar_mapa(ano_selecionado, cidade_selecionada, bairro_selecionado, zona_selecionada, evento_selecionado, hora_selecionada):
     df_filtrado = df
